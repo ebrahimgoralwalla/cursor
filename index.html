@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIDA TEST - Planning Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-icon">⚡</div>
+                <span class="app-title">AIDA TEST</span>
+                <nav class="main-nav">
+                    <a href="#" class="nav-item active">Documents</a>
+                    <a href="#" class="nav-item">Data</a>
+                    <a href="#" class="nav-item">Adjustments</a>
+                    <a href="#" class="nav-item">Risk & controls</a>
+                    <a href="#" class="nav-item">Issues</a>
+                    <a href="#" class="nav-item">Queries</a>
+                    <a href="#" class="nav-item">Analytics Hub</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <button class="add-btn">+</button>
+                <div class="user-avatar">👤</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Documents</h2>
+                    <div class="sidebar-controls">
+                        <button class="control-btn">📄</button>
+                        <button class="control-btn">⚙️</button>
+                        <button class="control-btn">⋯</button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-content">
+                    <div class="planning-section">
+                        <div class="section-header">
+                            <span class="section-indicator">⚪</span>
+                            <span class="section-title">Planning</span>
+                        </div>
+                        
+                        <div class="planning-items">
+                            <div class="planning-item">
+                                <span class="item-indicator">⚪</span>
+                                <span>Planning</span>
+                            </div>
+                            <div class="planning-item">
+                                <span class="item-indicator">⚪</span>
+                                <span>Risk Assessment</span>
+                            </div>
+                            <div class="planning-item">
+                                <span class="item-indicator">⚪</span>
+                                <span>Risk Response</span>
+                            </div>
+                            <div class="planning-item">
+                                <span class="item-indicator">⚪</span>
+                                <span>Completion</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Panel -->
+            <main class="main-panel">
+                <div class="content-header">
+                    <h1>Planning</h1>
+                </div>
+                
+                <div class="content-sections">
+                    <div class="section-group">
+                        <h3>Engagement Set-up</h3>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>A100 Optimise checklist - Initial Engagement Decisions</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-group">
+                        <h3>Client Acceptance/Continuance</h3>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>A200 Preliminary engagement activities</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-group">
+                        <h3>Overall Audit Strategy</h3>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>A300 Overall audit strategy</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-group">
+                        <h3>Team Discussions</h3>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>A400 Team planning discussions</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-group">
+                        <h3>Materiality</h3>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>A500 Materiality</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-group">
+                        <h3>Leases</h3>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>555 12th Street - Lease - Climate Reality Project - FULLY EXECUTED</span>
+                        </div>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>Lease agreement 1</span>
+                        </div>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>Lease agreement 2</span>
+                        </div>
+                        <div class="section-item">
+                            <span class="item-icon">📄</span>
+                            <span>Lease agreement 3</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Chatbot Panel -->
+            <div id="chatbot-panel" class="chatbot-panel">
+                <div class="chatbot-header">
+                    <div class="chatbot-title">
+                        <div class="chatbot-avatar">🤖</div>
+                        <span>Caseware AIDA</span>
+                    </div>
+                    <div class="chatbot-controls">
+                        <button id="popout-btn" class="control-btn" title="Pop out chat">⤴️</button>
+                        <button class="control-btn" title="Settings">⚙️</button>
+                    </div>
+                </div>
+                
+                <div class="chatbot-content">
+                    <div class="greeting-section">
+                        <div class="greeting-avatar">🌟</div>
+                        <div class="greeting-text">
+                            <h3>Hello, I'm AiDA</h3>
+                            <p>Ask me anything about your engagement to help you be more productive. You can ask a custom question or select one of the sample questions.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn">➤ Summarize</button>
+                    </div>
+                    
+                    <div class="help-text">
+                        <p>Help us improve Caseware AIDA by <a href="#">providing feedback</a></p>
+                    </div>
+                    
+                    <div class="chat-input-section">
+                        <div class="chat-input-container">
+                            <input type="text" id="chat-input" placeholder="Ask me a question" />
+                            <button id="send-btn" class="send-btn">➤</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popout Window Container -->
+    <div id="popout-window" class="popout-window hidden">
+        <div class="popout-header">
+            <div class="popout-title">
+                <div class="chatbot-avatar">🤖</div>
+                <span>Caseware AIDA - Embedded Chat</span>
+            </div>
+            <div class="popout-controls">
+                <button id="dock-btn" class="control-btn" title="Dock back">⤵️</button>
+                <button id="close-popout-btn" class="control-btn" title="Close">✕</button>
+            </div>
+        </div>
+        <div id="popout-content" class="popout-content">
+            <!-- Chatbot content will be moved here -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
