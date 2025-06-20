@@ -1,12 +1,19 @@
-class ChatbotPopout {
+class EnhancedChatbotPopout {
     constructor() {
         this.isPopped = false;
+        this.isMinimized = false;
+        this.currentMode = 'fixed'; // 'fixed' or 'floating'
         this.dragState = {
             isDragging: false,
             startX: 0,
             startY: 0,
             startLeft: 0,
             startTop: 0
+        };
+        this.resizeState = {
+            isResizing: false,
+            startX: 0,
+            startWidth: 0
         };
         
         this.init();
@@ -16,22 +23,28 @@ class ChatbotPopout {
         // Get DOM elements
         this.chatbotPanel = document.getElementById('chatbot-panel');
         this.popoutWindow = document.getElementById('popout-window');
+        this.minimizedWindow = document.getElementById('minimized-window');
         this.popoutContent = document.getElementById('popout-content');
         this.popoutBtn = document.getElementById('popout-btn');
         this.dockBtn = document.getElementById('dock-btn');
         this.closeBtn = document.getElementById('close-popout-btn');
+        this.minimizeBtn = document.getElementById('minimize-btn');
+        this.restoreBtn = document.getElementById('restore-btn');
         this.popoutHeader = document.querySelector('.popout-header');
+        this.resizeHandle = document.querySelector('.resize-handle');
+        this.fixedModeBtn = document.getElementById('fixed-mode-btn');
+        this.floatingModeBtn = document.getElementById('floating-mode-btn');
         
         // Bind event listeners
         this.bindEvents();
         
-        // Initialize drag functionality
+        // Initialize functionality
         this.initDrag();
-        
-        // Add chat functionality
+        this.initResize();
         this.initChat();
+        this.initModeControls();
         
-        console.log('Chatbot Popout initialized');
+        console.log('Enhanced Chatbot Popout initialized');
     }
     
     bindEvents() {
@@ -44,15 +57,59 @@ class ChatbotPopout {
         // Close button
         this.closeBtn.addEventListener('click', () => this.dockBack());
         
-        // Escape key to dock back
+        // Minimize button
+        this.minimizeBtn.addEventListener('click', () => this.minimize());
+        
+        // Restore button
+        this.restoreBtn.addEventListener('click', () => this.restore());
+        this.minimizedWindow.addEventListener('click', () => this.restore());
+        
+        // Escape key to dock back or restore
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isPopped) {
-                this.dockBack();
+            if (e.key === 'Escape') {
+                if (this.isMinimized) {
+                    this.restore();
+                } else if (this.isPopped) {
+                    this.dockBack();
+                }
             }
         });
         
         // Window resize handler
         window.addEventListener('resize', () => this.handleResize());
+    }
+    
+    initModeControls() {
+        this.fixedModeBtn.addEventListener('click', () => this.switchToFixedMode());
+        this.floatingModeBtn.addEventListener('click', () => this.switchToFloatingMode());
+    }
+    
+    switchToFixedMode() {
+        if (this.currentMode === 'fixed') return;
+        
+        this.currentMode = 'fixed';
+        this.fixedModeBtn.classList.add('active');
+        this.floatingModeBtn.classList.remove('active');
+        
+        if (this.isPopped) {
+            this.dockBack();
+        }
+        
+        console.log('Switched to fixed mode');
+    }
+    
+    switchToFloatingMode() {
+        if (this.currentMode === 'floating') return;
+        
+        this.currentMode = 'floating';
+        this.floatingModeBtn.classList.add('active');
+        this.fixedModeBtn.classList.remove('active');
+        
+        if (!this.isPopped) {
+            this.popOut();
+        }
+        
+        console.log('Switched to floating mode');
     }
     
     popOut() {
@@ -74,6 +131,7 @@ class ChatbotPopout {
             
             // Re-bind chat events in popout
             this.initChatInPopout();
+            this.initModeControlsInPopout();
             
             // Focus on input in popout
             const popoutInput = this.popoutContent.querySelector('#chat-input');
@@ -97,8 +155,10 @@ class ChatbotPopout {
             originalContent.innerHTML = popoutChatContent.innerHTML;
         }
         
-        // Hide popout window
+        // Hide popout window and minimized window
         this.popoutWindow.classList.add('hidden');
+        this.minimizedWindow.classList.add('hidden');
+        this.isMinimized = false;
         
         // Show original panel with animation
         this.chatbotPanel.style.display = 'flex';
@@ -114,9 +174,68 @@ class ChatbotPopout {
             
             // Re-bind chat events in main panel
             this.initChat();
+            this.initModeControls();
+            
+            // Update mode to fixed
+            this.currentMode = 'fixed';
+            this.fixedModeBtn.classList.add('active');
+            this.floatingModeBtn.classList.remove('active');
             
             console.log('Chatbot docked back successfully');
         }, 300);
+    }
+    
+    minimize() {
+        if (!this.isPopped || this.isMinimized) return;
+        
+        console.log('Minimizing chatbot...');
+        
+        this.popoutWindow.classList.add('minimized');
+        this.minimizedWindow.classList.remove('hidden');
+        this.isMinimized = true;
+        
+        // Add notification badge if there are unread messages
+        this.addNotificationBadge();
+        
+        console.log('Chatbot minimized');
+    }
+    
+    restore() {
+        if (!this.isPopped || !this.isMinimized) return;
+        
+        console.log('Restoring chatbot...');
+        
+        this.popoutWindow.classList.remove('minimized');
+        this.minimizedWindow.classList.add('hidden');
+        this.isMinimized = false;
+        
+        // Remove notification badge
+        this.removeNotificationBadge();
+        
+        // Focus on input
+        const popoutInput = this.popoutContent.querySelector('#chat-input');
+        if (popoutInput) {
+            popoutInput.focus();
+        }
+        
+        console.log('Chatbot restored');
+    }
+    
+    addNotificationBadge() {
+        const existingBadge = this.minimizedWindow.querySelector('.notification-badge');
+        if (existingBadge) return;
+        
+        const badge = document.createElement('div');
+        badge.className = 'notification-badge';
+        badge.textContent = '1';
+        this.minimizedWindow.appendChild(badge);
+    }
+    
+    removeNotificationBadge() {
+        const badge = this.minimizedWindow.querySelector('.notification-badge');
+        if (badge) {
+            badge.remove();
+        }
     }
     
     initDrag() {
@@ -126,7 +245,7 @@ class ChatbotPopout {
     }
     
     startDrag(e) {
-        if (!this.isPopped) return;
+        if (!this.isPopped || this.isMinimized) return;
         
         this.dragState.isDragging = true;
         this.dragState.startX = e.clientX;
@@ -136,14 +255,13 @@ class ChatbotPopout {
         this.dragState.startLeft = rect.left;
         this.dragState.startTop = rect.top;
         
-        this.popoutWindow.style.cursor = 'grabbing';
-        this.popoutHeader.style.cursor = 'grabbing';
+        this.popoutWindow.classList.add('dragging');
         
         e.preventDefault();
     }
     
     drag(e) {
-        if (!this.dragState.isDragging || !this.isPopped) return;
+        if (!this.dragState.isDragging || !this.isPopped || this.isMinimized) return;
         
         const deltaX = e.clientX - this.dragState.startX;
         const deltaY = e.clientY - this.dragState.startY;
@@ -151,12 +269,13 @@ class ChatbotPopout {
         const newLeft = this.dragState.startLeft + deltaX;
         const newTop = this.dragState.startTop + deltaY;
         
-        // Constrain to viewport
-        const maxLeft = window.innerWidth - this.popoutWindow.offsetWidth;
-        const maxTop = window.innerHeight - this.popoutWindow.offsetHeight;
+        // Constrain to viewport with some padding
+        const padding = 20;
+        const maxLeft = window.innerWidth - this.popoutWindow.offsetWidth - padding;
+        const maxTop = window.innerHeight - this.popoutWindow.offsetHeight - padding;
         
-        const constrainedLeft = Math.max(0, Math.min(newLeft, maxLeft));
-        const constrainedTop = Math.max(0, Math.min(newTop, maxTop));
+        const constrainedLeft = Math.max(padding, Math.min(newLeft, maxLeft));
+        const constrainedTop = Math.max(padding, Math.min(newTop, maxTop));
         
         this.popoutWindow.style.left = constrainedLeft + 'px';
         this.popoutWindow.style.top = constrainedTop + 'px';
@@ -168,8 +287,45 @@ class ChatbotPopout {
         if (!this.dragState.isDragging) return;
         
         this.dragState.isDragging = false;
-        this.popoutWindow.style.cursor = 'default';
-        this.popoutHeader.style.cursor = 'move';
+        this.popoutWindow.classList.remove('dragging');
+    }
+    
+    initResize() {
+        this.resizeHandle.addEventListener('mousedown', (e) => this.startResize(e));
+        document.addEventListener('mousemove', (e) => this.resize(e));
+        document.addEventListener('mouseup', () => this.stopResize());
+    }
+    
+    startResize(e) {
+        if (this.isPopped) return;
+        
+        this.resizeState.isResizing = true;
+        this.resizeState.startX = e.clientX;
+        this.resizeState.startWidth = this.chatbotPanel.offsetWidth;
+        
+        document.body.style.cursor = 'col-resize';
+        e.preventDefault();
+    }
+    
+    resize(e) {
+        if (!this.resizeState.isResizing || this.isPopped) return;
+        
+        const deltaX = this.resizeState.startX - e.clientX;
+        const newWidth = this.resizeState.startWidth + deltaX;
+        
+        // Constrain width
+        const minWidth = 250;
+        const maxWidth = 600;
+        const constrainedWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
+        
+        this.chatbotPanel.style.width = constrainedWidth + 'px';
+    }
+    
+    stopResize() {
+        if (!this.resizeState.isResizing) return;
+        
+        this.resizeState.isResizing = false;
+        document.body.style.cursor = 'default';
     }
     
     handleResize() {
@@ -177,14 +333,21 @@ class ChatbotPopout {
         
         // Ensure popout window stays within viewport bounds
         const rect = this.popoutWindow.getBoundingClientRect();
-        const maxLeft = window.innerWidth - rect.width;
-        const maxTop = window.innerHeight - rect.height;
+        const padding = 20;
+        const maxLeft = window.innerWidth - rect.width - padding;
+        const maxTop = window.innerHeight - rect.height - padding;
         
         if (rect.left > maxLeft) {
             this.popoutWindow.style.left = maxLeft + 'px';
         }
         if (rect.top > maxTop) {
             this.popoutWindow.style.top = maxTop + 'px';
+        }
+        if (rect.left < padding) {
+            this.popoutWindow.style.left = padding + 'px';
+        }
+        if (rect.top < padding) {
+            this.popoutWindow.style.top = padding + 'px';
         }
     }
     
@@ -207,13 +370,8 @@ class ChatbotPopout {
                 }
             });
             
-            // Add quick action listener
-            const quickActionBtn = document.querySelector('.quick-action-btn');
-            if (quickActionBtn) {
-                quickActionBtn.addEventListener('click', () => {
-                    this.simulateResponse('Here\'s a summary of your current engagement activities...');
-                });
-            }
+            // Add quick action listeners
+            this.bindQuickActions();
         }
     }
     
@@ -229,14 +387,49 @@ class ChatbotPopout {
                 }
             });
             
-            // Add quick action listener
-            const quickActionBtn = this.popoutContent.querySelector('.quick-action-btn');
-            if (quickActionBtn) {
-                quickActionBtn.addEventListener('click', () => {
-                    this.simulateResponseInPopout('Here\'s a summary of your current engagement activities...');
-                });
-            }
+            // Add quick action listeners in popout
+            this.bindQuickActionsInPopout();
         }
+    }
+    
+    initModeControlsInPopout() {
+        const fixedModeBtn = this.popoutContent.querySelector('#fixed-mode-btn');
+        const floatingModeBtn = this.popoutContent.querySelector('#floating-mode-btn');
+        
+        if (fixedModeBtn && floatingModeBtn) {
+            fixedModeBtn.addEventListener('click', () => this.switchToFixedMode());
+            floatingModeBtn.addEventListener('click', () => this.switchToFloatingMode());
+        }
+    }
+    
+    bindQuickActions() {
+        const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+        quickActionBtns.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                const responses = [
+                    'Here\'s a summary of your current engagement: You have completed 6 out of 12 planning sections. The materiality has been set at $150,000. Next steps include completing the risk assessment and team discussions.',
+                    'Reviewing your checklist: Missing documents include signed engagement letter, management representation letter, and 3 lease agreements. I recommend prioritizing the engagement letter first.',
+                    'Missing documents identified: 1) Updated trial balance 2) Bank confirmations 3) Accounts receivable aging 4) Fixed asset register. Would you like me to help draft requests for these?',
+                    'Suggested next steps: 1) Complete A400 Team planning discussions 2) Finalize materiality calculations 3) Review and update risk assessment 4) Schedule client meetings for document collection.'
+                ];
+                this.simulateResponse(responses[index] || 'I can help you with that. What specific information do you need?');
+            });
+        });
+    }
+    
+    bindQuickActionsInPopout() {
+        const quickActionBtns = this.popoutContent.querySelectorAll('.quick-action-btn');
+        quickActionBtns.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                const responses = [
+                    'Here\'s a summary of your current engagement: You have completed 6 out of 12 planning sections. The materiality has been set at $150,000. Next steps include completing the risk assessment and team discussions.',
+                    'Reviewing your checklist: Missing documents include signed engagement letter, management representation letter, and 3 lease agreements. I recommend prioritizing the engagement letter first.',
+                    'Missing documents identified: 1) Updated trial balance 2) Bank confirmations 3) Accounts receivable aging 4) Fixed asset register. Would you like me to help draft requests for these?',
+                    'Suggested next steps: 1) Complete A400 Team planning discussions 2) Finalize materiality calculations 3) Review and update risk assessment 4) Schedule client meetings for document collection.'
+                ];
+                this.simulateResponseInPopout(responses[index] || 'I can help you with that. What specific information do you need?');
+            });
+        });
     }
     
     sendMessage() {
@@ -247,10 +440,14 @@ class ChatbotPopout {
             this.addMessage(message, 'user');
             chatInput.value = '';
             
-            // Simulate AI response
+            // Show typing indicator
+            this.showTypingIndicator();
+            
+            // Simulate AI response with realistic delay
             setTimeout(() => {
-                this.simulateResponse(`I understand you're asking about "${message}". Let me help you with that...`);
-            }, 1000);
+                this.hideTypingIndicator();
+                this.simulateResponse(this.generateContextualResponse(message));
+            }, 1500 + Math.random() * 1000);
         }
     }
     
@@ -262,10 +459,69 @@ class ChatbotPopout {
             this.addMessageInPopout(message, 'user');
             chatInput.value = '';
             
+            // Show typing indicator
+            this.showTypingIndicatorInPopout();
+            
             // Simulate AI response
             setTimeout(() => {
-                this.simulateResponseInPopout(`I understand you're asking about "${message}". Let me help you with that...`);
-            }, 1000);
+                this.hideTypingIndicatorInPopout();
+                this.simulateResponseInPopout(this.generateContextualResponse(message));
+            }, 1500 + Math.random() * 1000);
+        }
+    }
+    
+    generateContextualResponse(message) {
+        const lowMessage = message.toLowerCase();
+        
+        if (lowMessage.includes('materiality')) {
+            return 'Based on your engagement, I see materiality is set at $150,000. This represents 5% of pre-tax income. Would you like me to help you reassess this based on the latest financial information?';
+        } else if (lowMessage.includes('risk') || lowMessage.includes('assessment')) {
+            return 'For your risk assessment, I notice you haven\'t completed the fraud risk evaluation. Key areas to consider include revenue recognition, management override of controls, and related party transactions. Shall I guide you through this?';
+        } else if (lowMessage.includes('document') || lowMessage.includes('missing')) {
+            return 'I\'ve identified several missing documents in your engagement file. Priority items include: bank confirmations, management rep letter, and lease agreements. Would you like me to generate template requests?';
+        } else if (lowMessage.includes('planning') || lowMessage.includes('strategy')) {
+            return 'Your overall audit strategy shows good progress. Consider updating the staffing plan based on the risk assessment results. The client has indicated some time constraints - shall I suggest an optimized approach?';
+        } else if (lowMessage.includes('team') || lowMessage.includes('discuss')) {
+            return 'Team discussions are crucial for engagement quality. I recommend scheduling a discussion about significant risks, journal entry testing approach, and coordination with component auditors. Need help preparing an agenda?';
+        } else {
+            return `I understand you're asking about "${message}". Based on your current engagement status, I can help you with planning activities, risk assessments, document management, or team coordination. What would be most helpful right now?`;
+        }
+    }
+    
+    showTypingIndicator() {
+        const chatContent = document.querySelector('.chatbot-content');
+        const inputSection = chatContent.querySelector('.chat-input-section');
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'typing-indicator';
+        typingDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+        
+        chatContent.insertBefore(typingDiv, inputSection);
+        chatContent.scrollTop = chatContent.scrollHeight;
+    }
+    
+    hideTypingIndicator() {
+        const typingIndicator = document.querySelector('.typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+    
+    showTypingIndicatorInPopout() {
+        const inputSection = this.popoutContent.querySelector('.chat-input-section');
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'typing-indicator';
+        typingDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+        
+        this.popoutContent.insertBefore(typingDiv, inputSection);
+        this.popoutContent.scrollTop = this.popoutContent.scrollHeight;
+    }
+    
+    hideTypingIndicatorInPopout() {
+        const typingIndicator = this.popoutContent.querySelector('.typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
         }
     }
     
@@ -295,12 +551,6 @@ class ChatbotPopout {
     createMessageElement(message, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}-message`;
-        messageDiv.style.cssText = `
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            ${sender === 'user' ? 'flex-direction: row-reverse;' : ''}
-        `;
         
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
@@ -314,25 +564,14 @@ class ChatbotPopout {
             flex-shrink: 0;
             font-size: 16px;
             ${sender === 'user' 
-                ? 'background: linear-gradient(135deg, #4CAF50, #45a049); color: white;' 
-                : 'background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white;'
+                ? 'background: linear-gradient(135deg, #4CAF50, #45a049);' 
+                : 'background: linear-gradient(135deg, #ff6b6b, #ee5a24);'
             }
         `;
         avatar.textContent = sender === 'user' ? '👤' : '🤖';
         
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
-        messageContent.style.cssText = `
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.4;
-            ${sender === 'user' 
-                ? 'background: #e3f2fd; color: #1976d2; margin-left: 40px;' 
-                : 'background: #f5f5f5; color: #333; margin-right: 40px;'
-            }
-        `;
         messageContent.textContent = message;
         
         messageDiv.appendChild(avatar);
@@ -344,29 +583,38 @@ class ChatbotPopout {
     simulateResponse(response) {
         setTimeout(() => {
             this.addMessage(response, 'ai');
-        }, 500);
+        }, 100);
     }
     
     simulateResponseInPopout(response) {
         setTimeout(() => {
             this.addMessageInPopout(response, 'ai');
-        }, 500);
+        }, 100);
     }
 }
 
-// Initialize the chatbot popout when the DOM is loaded
+// Initialize the enhanced chatbot when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new ChatbotPopout();
+    new EnhancedChatbotPopout();
 });
 
-// Add some additional interactive features
+// Add interactive features for the main interface
 document.addEventListener('DOMContentLoaded', () => {
-    // Add hover effects to section items
+    // Add hover effects and click handlers to section items
     const sectionItems = document.querySelectorAll('.section-item');
     sectionItems.forEach(item => {
         item.addEventListener('click', () => {
-            console.log('Clicked on:', item.textContent.trim());
-            // You could add functionality to open documents here
+            const itemName = item.textContent.trim();
+            console.log('Clicked on:', itemName);
+            
+            // Simulate opening a document or form
+            item.style.background = '#e3f2fd';
+            item.style.borderColor = '#1976d2';
+            
+            setTimeout(() => {
+                item.style.background = '#fafafa';
+                item.style.borderColor = '#e0e0e0';
+            }, 2000);
         });
     });
     
@@ -383,16 +631,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 items.forEach(item => {
                     item.style.display = 'flex';
                 });
-                header.style.opacity = '1';
+                header.querySelector('::after') && (header.style.transform = 'rotate(0deg)');
             } else {
                 group.classList.add('collapsed');
                 items.forEach(item => {
                     item.style.display = 'none';
                 });
-                header.style.opacity = '0.7';
+                header.querySelector('::after') && (header.style.transform = 'rotate(-90deg)');
             }
         });
         
         header.style.cursor = 'pointer';
+        header.title = 'Click to expand/collapse';
     });
+    
+    // Add realistic workflow simulation
+    setTimeout(() => {
+        // Simulate some activity in the interface
+        const items = document.querySelectorAll('.section-item');
+        if (items.length > 0) {
+            // Mark some items as completed
+            items[0].style.background = '#e8f5e8';
+            items[0].style.borderColor = '#4caf50';
+            items[0].querySelector('.item-icon').textContent = '✅';
+            
+            if (items[1]) {
+                items[1].style.background = '#fff3e0';
+                items[1].style.borderColor = '#ff9800';
+                items[1].querySelector('.item-icon').textContent = '⏳';
+            }
+        }
+    }, 3000);
 }); 

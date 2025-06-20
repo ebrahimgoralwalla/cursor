@@ -153,6 +153,9 @@
                     </div>
                 </div>
                 
+                <!-- Resize handle for side panel -->
+                <div class="resize-handle"></div>
+                
                 <div class="chatbot-content">
                     <div class="greeting-section">
                         <div class="greeting-avatar">🌟</div>
@@ -162,8 +165,20 @@
                         </div>
                     </div>
                     
+                    <!-- Panel Mode Controls -->
+                    <div class="panel-mode-controls">
+                        <h4>Display Mode:</h4>
+                        <div class="mode-buttons">
+                            <button id="fixed-mode-btn" class="mode-btn active">📌 Fixed Panel</button>
+                            <button id="floating-mode-btn" class="mode-btn">🪟 Floating Window</button>
+                        </div>
+                    </div>
+                    
                     <div class="quick-actions">
                         <button class="quick-action-btn">➤ Summarize</button>
+                        <button class="quick-action-btn">➤ Review checklist items</button>
+                        <button class="quick-action-btn">➤ Identify missing documents</button>
+                        <button class="quick-action-btn">➤ Suggest next steps</button>
                     </div>
                     
                     <div class="help-text">
@@ -172,7 +187,7 @@
                     
                     <div class="chat-input-section">
                         <div class="chat-input-container">
-                            <input type="text" id="chat-input" placeholder="Ask me a question" />
+                            <input type="text" id="chat-input" placeholder="Ask me a question about your audit" />
                             <button id="send-btn" class="send-btn">➤</button>
                         </div>
                     </div>
@@ -186,15 +201,27 @@
         <div class="popout-header">
             <div class="popout-title">
                 <div class="chatbot-avatar">🤖</div>
-                <span>Caseware AIDA - Embedded Chat</span>
+                <span>Caseware AIDA - Floating Chat</span>
             </div>
             <div class="popout-controls">
+                <button id="minimize-btn" class="control-btn" title="Minimize">⎯</button>
                 <button id="dock-btn" class="control-btn" title="Dock back">⤵️</button>
                 <button id="close-popout-btn" class="control-btn" title="Close">✕</button>
             </div>
         </div>
         <div id="popout-content" class="popout-content">
             <!-- Chatbot content will be moved here -->
+        </div>
+    </div>
+
+    <!-- Minimized Window -->
+    <div id="minimized-window" class="minimized-window hidden">
+        <div class="minimized-header">
+            <div class="minimized-title">
+                <div class="chatbot-avatar">🤖</div>
+                <span>AIDA</span>
+            </div>
+            <button id="restore-btn" class="control-btn" title="Restore">⬜</button>
         </div>
     </div>
 
