@@ -83,7 +83,15 @@ class EnhancedChatbotPopout {
         
         // Move chatbot content to popout window
         const chatbotContent = this.chatbotPanel.querySelector('.chatbot-content');
-        this.popoutContent.appendChild(chatbotContent.cloneNode(true));
+        const clonedContent = chatbotContent.cloneNode(true);
+        
+        // Fix duplicate IDs by updating them in the cloned content
+        const chatInput = clonedContent.querySelector('#chat-input');
+        const sendBtn = clonedContent.querySelector('#send-btn');
+        if (chatInput) chatInput.id = 'chat-input-popout';
+        if (sendBtn) sendBtn.id = 'send-btn-popout';
+        
+        this.popoutContent.appendChild(clonedContent);
         
         // Hide original panel with animation
         this.chatbotPanel.classList.add('sliding-out');
@@ -97,7 +105,7 @@ class EnhancedChatbotPopout {
             this.initChatInPopout();
             
             // Focus on input in popout
-            const popoutInput = this.popoutContent.querySelector('#chat-input');
+            const popoutInput = this.popoutContent.querySelector('#chat-input-popout');
             if (popoutInput) {
                 popoutInput.focus();
             }
@@ -170,7 +178,7 @@ class EnhancedChatbotPopout {
         this.removeNotificationBadge();
         
         // Focus on input
-        const popoutInput = this.popoutContent.querySelector('#chat-input');
+        const popoutInput = this.popoutContent.querySelector('#chat-input-popout');
         if (popoutInput) {
             popoutInput.focus();
         }
@@ -333,10 +341,15 @@ class EnhancedChatbotPopout {
     }
     
     initChatInPopout() {
-        const chatInput = this.popoutContent.querySelector('#chat-input');
-        const sendBtn = this.popoutContent.querySelector('#send-btn');
+        console.log('Initializing chat in popout...');
+        const chatInput = this.popoutContent.querySelector('#chat-input-popout');
+        const sendBtn = this.popoutContent.querySelector('#send-btn-popout');
+        
+        console.log('Chat input found:', !!chatInput);
+        console.log('Send button found:', !!sendBtn);
         
         if (chatInput && sendBtn) {
+            console.log('Binding chat events in popout...');
             sendBtn.addEventListener('click', () => this.sendMessageInPopout());
             chatInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -346,6 +359,8 @@ class EnhancedChatbotPopout {
             
             // Add quick action listeners in popout
             this.bindQuickActionsInPopout();
+        } else {
+            console.error('Chat input or send button not found in popout!');
         }
     }
 
@@ -366,9 +381,14 @@ class EnhancedChatbotPopout {
     }
     
     bindQuickActionsInPopout() {
+        console.log('Binding quick actions in popout...');
         const quickActionBtns = this.popoutContent.querySelectorAll('.quick-action-btn');
+        console.log('Found', quickActionBtns.length, 'quick action buttons in popout');
+        
         quickActionBtns.forEach((btn, index) => {
+            console.log('Binding quick action button', index, ':', btn.textContent.trim());
             btn.addEventListener('click', () => {
+                console.log('Quick action clicked:', index, btn.textContent.trim());
                 const responses = [
                     'Here\'s a summary of your current engagement: You have completed 6 out of 12 planning sections. The materiality has been set at $150,000. Next steps include completing the risk assessment and team discussions.',
                     'Reviewing your checklist: Missing documents include signed engagement letter, management representation letter, and 3 lease agreements. I recommend prioritizing the engagement letter first.',
@@ -400,7 +420,7 @@ class EnhancedChatbotPopout {
     }
     
     sendMessageInPopout() {
-        const chatInput = this.popoutContent.querySelector('#chat-input');
+        const chatInput = this.popoutContent.querySelector('#chat-input-popout');
         const message = chatInput.value.trim();
         
         if (message) {
