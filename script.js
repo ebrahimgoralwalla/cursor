@@ -2,7 +2,6 @@ class EnhancedChatbotPopout {
     constructor() {
         this.isPopped = false;
         this.isMinimized = false;
-        this.currentMode = 'fixed'; // 'fixed' or 'floating'
         this.dragState = {
             isDragging: false,
             startX: 0,
@@ -32,8 +31,6 @@ class EnhancedChatbotPopout {
         this.restoreBtn = document.getElementById('restore-btn');
         this.popoutHeader = document.querySelector('.popout-header');
         this.resizeHandle = document.querySelector('.resize-handle');
-        this.fixedModeBtn = document.getElementById('fixed-mode-btn');
-        this.floatingModeBtn = document.getElementById('floating-mode-btn');
         
         // Bind event listeners
         this.bindEvents();
@@ -42,7 +39,6 @@ class EnhancedChatbotPopout {
         this.initDrag();
         this.initResize();
         this.initChat();
-        this.initModeControls();
         
         console.log('Enhanced Chatbot Popout initialized');
     }
@@ -78,39 +74,7 @@ class EnhancedChatbotPopout {
         // Window resize handler
         window.addEventListener('resize', () => this.handleResize());
     }
-    
-    initModeControls() {
-        this.fixedModeBtn.addEventListener('click', () => this.switchToFixedMode());
-        this.floatingModeBtn.addEventListener('click', () => this.switchToFloatingMode());
-    }
-    
-    switchToFixedMode() {
-        if (this.currentMode === 'fixed') return;
-        
-        this.currentMode = 'fixed';
-        this.fixedModeBtn.classList.add('active');
-        this.floatingModeBtn.classList.remove('active');
-        
-        if (this.isPopped) {
-            this.dockBack();
-        }
-        
-        console.log('Switched to fixed mode');
-    }
-    
-    switchToFloatingMode() {
-        if (this.currentMode === 'floating') return;
-        
-        this.currentMode = 'floating';
-        this.floatingModeBtn.classList.add('active');
-        this.fixedModeBtn.classList.remove('active');
-        
-        if (!this.isPopped) {
-            this.popOut();
-        }
-        
-        console.log('Switched to floating mode');
-    }
+
     
     popOut() {
         if (this.isPopped) return;
@@ -131,7 +95,6 @@ class EnhancedChatbotPopout {
             
             // Re-bind chat events in popout
             this.initChatInPopout();
-            this.initModeControlsInPopout();
             
             // Focus on input in popout
             const popoutInput = this.popoutContent.querySelector('#chat-input');
@@ -174,12 +137,6 @@ class EnhancedChatbotPopout {
             
             // Re-bind chat events in main panel
             this.initChat();
-            this.initModeControls();
-            
-            // Update mode to fixed
-            this.currentMode = 'fixed';
-            this.fixedModeBtn.classList.add('active');
-            this.floatingModeBtn.classList.remove('active');
             
             console.log('Chatbot docked back successfully');
         }, 300);
@@ -391,16 +348,7 @@ class EnhancedChatbotPopout {
             this.bindQuickActionsInPopout();
         }
     }
-    
-    initModeControlsInPopout() {
-        const fixedModeBtn = this.popoutContent.querySelector('#fixed-mode-btn');
-        const floatingModeBtn = this.popoutContent.querySelector('#floating-mode-btn');
-        
-        if (fixedModeBtn && floatingModeBtn) {
-            fixedModeBtn.addEventListener('click', () => this.switchToFixedMode());
-            floatingModeBtn.addEventListener('click', () => this.switchToFloatingMode());
-        }
-    }
+
     
     bindQuickActions() {
         const quickActionBtns = document.querySelectorAll('.quick-action-btn');

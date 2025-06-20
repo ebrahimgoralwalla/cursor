@@ -585,53 +585,7 @@ body {
     width: 8px;
 }
 
-/* Panel Mode Controls */
-.panel-mode-controls {
-    padding: 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-}
 
-.panel-mode-controls h4 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 12px;
-}
-
-.mode-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.mode-btn {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #e0e0e0;
-    background: white;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-}
-
-.mode-btn:hover {
-    background: #f0f0f0;
-    border-color: #d0d0d0;
-}
-
-.mode-btn.active {
-    background: #e3f2fd;
-    border-color: #1976d2;
-    color: #1976d2;
-    font-weight: 600;
-}
 
 /* Minimized Window */
 .minimized-window {
@@ -854,19 +808,6 @@ body {
 }
 
 @media (max-width: 768px) {
-    .panel-mode-controls {
-        padding: 12px;
-    }
-    
-    .mode-buttons {
-        flex-direction: column;
-    }
-    
-    .mode-btn {
-        font-size: 11px;
-        padding: 6px 8px;
-    }
-    
     .popout-window {
         width: 95vw;
         height: 70vh;
